@@ -1,0 +1,56 @@
+version: '3'
+
+networks:
+  my-network:
+    driver: bridge
+
+# volumes:
+#   dir-site:
+#     driver_opts:
+#       type: bind
+#       device: "D:/Test_volume/compose/sites"
+
+services:
+  php_service:
+    container_name: php_cont1
+    build:
+      dockerfile: Dockerfile
+      context: ./php/
+    hostname: php
+    restart: always
+    networks:
+      - my-network
+    volumes:
+      - ./sites:/home/sites
+
+  httpd_service:
+    container_name: httpd_cont1
+    image: 'httpd:latest'
+    hostname: httpd
+    networks:
+      - my-network
+    volumes:
+      - ./sites:/home/sites
+      - ./httpd.conf:/usr/local/apache2/conf/httpd.conf
+    ports:
+      - '9999:80'
+      - '433:433'
+
+  mysql_service:
+    container_name: mysql_cont1
+    image: 'mysql:latest'
+    hostname: mysql
+    networks:
+      - my-network
+    volumes:
+      - ./db:/var/lib/mysql
+      - ./my.cnf:/etc/mysql/my.cnf
+    environment:
+      - MYSQL_ROOT_PASSWORD=Abc123321
+      - MYSQL_DATABASE=db_site
+      - MYSQL_USER=siteuser
+      - MYSQL_PASSWORD=sitepass
+
+
+
+
